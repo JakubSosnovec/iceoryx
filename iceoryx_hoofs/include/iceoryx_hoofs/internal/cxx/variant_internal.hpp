@@ -92,88 +92,105 @@ struct get_type_at_index<N, N, T, Targs...>
     using type = T;
 };
 
+template <uint64_t A, uint64_t S>
+using aligned_bytes alignas(A) = byte_t[S];
+
 template <uint64_t N, typename T, typename... Targs>
 struct call_at_index
 {
-    static void destructor(const uint64_t index, byte_t* ptr) noexcept
+    template <uint64_t A = algorithm::maxVal(alignof(T), alignof(Targs)...),
+              uint64_t S = algorithm::maxVal(sizeof(T), sizeof(Targs)...)>
+    static void destructor(const uint64_t index, aligned_bytes<A, S>& ptr) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            reinterpret_cast<T*>(ptr)->~T();
+            reinterpret_cast<T*>(&ptr)->~T();
         }
         else
         {
-            call_at_index<N + 1, Targs...>::destructor(index, ptr);
+            call_at_index<N + 1, Targs...>::template destructor<A, S>(index, ptr);
         }
     }
 
-    static void move(const uint64_t index, byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = algorithm::maxVal(alignof(T), alignof(Targs)...),
+              uint64_t S = algorithm::maxVal(sizeof(T), sizeof(Targs)...)>
+    static void move(const uint64_t index, aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            *reinterpret_cast<T*>(destination) = std::move(*reinterpret_cast<T*>(source));
+            *reinterpret_cast<T*>(&destination) = std::move(*reinterpret_cast<T*>(&source));
         }
         else
         {
-            call_at_index<N + 1, Targs...>::move(index, source, destination);
+            call_at_index<N + 1, Targs...>::template move<A, S>(index, source, destination);
         }
     }
 
-    static void moveConstructor(const uint64_t index, byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = algorithm::maxVal(alignof(T), alignof(Targs)...),
+              uint64_t S = algorithm::maxVal(sizeof(T), sizeof(Targs)...)>
+    static void
+    moveConstructor(const uint64_t index, aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            new (destination) T(std::move(*reinterpret_cast<T*>(source)));
+            new (&destination) T(std::move(*reinterpret_cast<T*>(&source)));
         }
         else
         {
-            call_at_index<N + 1, Targs...>::moveConstructor(index, source, destination);
+            call_at_index<N + 1, Targs...>::template moveConstructor<A, S>(index, source, destination);
         }
     }
 
-    static void copy(const uint64_t index, const byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = algorithm::maxVal(alignof(T), alignof(Targs)...),
+              uint64_t S = algorithm::maxVal(sizeof(T), sizeof(Targs)...)>
+    static void copy(const uint64_t index, const aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            *reinterpret_cast<T*>(destination) = *reinterpret_cast<const T*>(source);
+            *reinterpret_cast<T*>(&destination) = *reinterpret_cast<const T*>(&source);
         }
         else
         {
-            call_at_index<N + 1, Targs...>::copy(index, source, destination);
+            call_at_index<N + 1, Targs...>::template copy<A, S>(index, source, destination);
         }
     }
 
-    static void copyConstructor(const uint64_t index, const byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = algorithm::maxVal(alignof(T), alignof(Targs)...),
+              uint64_t S = algorithm::maxVal(sizeof(T), sizeof(Targs)...)>
+    static void
+    copyConstructor(const uint64_t index, const aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            new (destination) T(*reinterpret_cast<const T*>(source));
+            new (&destination) T(*reinterpret_cast<const T*>(&source));
         }
         else
         {
-            call_at_index<N + 1, Targs...>::copyConstructor(index, source, destination);
+            call_at_index<N + 1, Targs...>::template copyConstructor<A, S>(index, source, destination);
         }
     }
 
-    static bool equality(const uint64_t index, const byte_t* lhs, const byte_t* rhs)
+    template <uint64_t A = algorithm::maxVal(alignof(T), alignof(Targs)...),
+              uint64_t S = algorithm::maxVal(sizeof(T), sizeof(Targs)...)>
+    static bool equality(const uint64_t index, const aligned_bytes<A, S>& lhs, const aligned_bytes<A, S>& rhs)
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter and encapsulated in this class
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            return *reinterpret_cast<const T*>(lhs) == *reinterpret_cast<const T*>(rhs);
+            return *reinterpret_cast<const T*>(&lhs) == *reinterpret_cast<const T*>(&rhs);
         }
-        return call_at_index<N + 1, Targs...>::equality(index, lhs, rhs);
+        return call_at_index<N + 1, Targs...>::template equality<A, S>(index, lhs, rhs);
     }
 };
 
@@ -182,13 +199,14 @@ struct call_at_index<N, T>
 {
     // NOLINTJUSTIFICATION d'tor changes the data to which source is pointing to
     // NOLINTNEXTLINE(readability-non-const-parameter)
-    static void destructor(const uint64_t index, byte_t* ptr) noexcept
+    template <uint64_t A = alignof(T), uint64_t S = sizeof(T)>
+    static void destructor(const uint64_t index, aligned_bytes<A, S>& ptr) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            reinterpret_cast<T*>(ptr)->~T();
+            reinterpret_cast<T*>(&ptr)->~T();
         }
         else
         {
@@ -198,13 +216,14 @@ struct call_at_index<N, T>
 
     // NOLINTJUSTIFICATION move c'tor changes the data to which source is pointing to
     // NOLINTNEXTLINE(readability-non-const-parameter)
-    static void move(const uint64_t index, byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = alignof(T), uint64_t S = sizeof(T)>
+    static void move(const uint64_t index, aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            *reinterpret_cast<T*>(destination) = std::move(*reinterpret_cast<T*>(source));
+            *reinterpret_cast<T*>(&destination) = std::move(*reinterpret_cast<T*>(&source));
         }
         else
         {
@@ -214,13 +233,14 @@ struct call_at_index<N, T>
 
     // NOLINTJUSTIFICATION Both 'source' and 'destination' will be changed and can't be const
     // NOLINTNEXTLINE(readability-non-const-parameter)
-    static void moveConstructor(const uint64_t index, byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = alignof(T), uint64_t S = sizeof(T)>
+    static void moveConstructor(const uint64_t index, aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            new (destination) T(std::move(*reinterpret_cast<T*>(source)));
+            new (&destination) T(std::move(*reinterpret_cast<T*>(&source)));
         }
         else
         {
@@ -228,13 +248,14 @@ struct call_at_index<N, T>
         }
     }
 
-    static void copy(const uint64_t index, const byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = alignof(T), uint64_t S = sizeof(T)>
+    static void copy(const uint64_t index, const aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            *reinterpret_cast<T*>(destination) = *reinterpret_cast<const T*>(source);
+            *reinterpret_cast<T*>(&destination) = *reinterpret_cast<const T*>(&source);
         }
         else
         {
@@ -244,13 +265,15 @@ struct call_at_index<N, T>
 
     // NOLINTJUSTIFICATION 'operator new()' needs non-const 'destination'
     // NOLINTNEXTLINE(readability-non-const-parameter)
-    static void copyConstructor(const uint64_t index, const byte_t* source, byte_t* destination) noexcept
+    template <uint64_t A = alignof(T), uint64_t S = sizeof(T)>
+    static void
+    copyConstructor(const uint64_t index, const aligned_bytes<A, S>& source, const aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            new (destination) T(*reinterpret_cast<const T*>(source));
+            new (&destination) T(*reinterpret_cast<const T*>(&source));
         }
         else
         {
@@ -258,13 +281,14 @@ struct call_at_index<N, T>
         }
     }
 
-    static bool equality(const uint64_t index, const byte_t* lhs, const byte_t* rhs) noexcept
+    template <uint64_t A = alignof(T), uint64_t S = sizeof(T)>
+    static bool equality(const uint64_t index, const aligned_bytes<A, S>& lhs, const aligned_bytes<A, S>& rhs) noexcept
     {
         if (N == index)
         {
             // AXIVION Next Construct AutosarC++19_03-A5.2.4 : Type safety ensured through template parameter and encapsulated in this class
             // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-            return *reinterpret_cast<const T*>(lhs) == *reinterpret_cast<const T*>(rhs);
+            return *reinterpret_cast<const T*>(&lhs) == *reinterpret_cast<const T*>(&rhs);
         }
         ExpectsWithMsg(false, "Could not call equality operator for variant element");
         return false;
