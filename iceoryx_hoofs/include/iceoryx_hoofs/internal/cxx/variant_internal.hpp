@@ -267,7 +267,7 @@ struct call_at_index<N, T>
     // NOLINTNEXTLINE(readability-non-const-parameter)
     template <uint64_t A = alignof(T), uint64_t S = sizeof(T)>
     static void
-    copyConstructor(const uint64_t index, const aligned_bytes<A, S>& source, const aligned_bytes<A, S>& destination) noexcept
+    copyConstructor(const uint64_t index, const aligned_bytes<A, S>& source, aligned_bytes<A, S>& destination) noexcept
     {
         if (N == index)
         {
