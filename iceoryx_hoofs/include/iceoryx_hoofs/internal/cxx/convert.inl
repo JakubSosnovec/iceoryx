@@ -57,17 +57,9 @@ convert::toString(const Source& t) noexcept
 }
 
 template <typename Destination>
-inline typename std::enable_if<std::is_convertible<const char*, Destination>::value, bool>::type
-fromString(const char* v, Destination& dest) noexcept
+inline bool convert::fromString(const char* v, Destination& dest) noexcept
 {
     dest = Destination(v);
-    return true;
-}
-
-template <>
-inline bool convert::fromString<std::string>(const char* v, std::string& dest) noexcept
-{
-    dest = std::string(v);
     return true;
 }
 
@@ -86,15 +78,12 @@ inline bool convert::fromString<char>(const char* v, char& dest) noexcept
     return true;
 }
 
-/// @NOLINTJUSTIFICATION @todo iox-#260 convert must be refactored
-/// @NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-template <>
-inline bool convert::fromString<string<100>>(const char* v, string<100>& dest) noexcept
+template <uint64_t Capacity>
+inline bool convert::fromString(const char* v, string<Capacity>& dest) noexcept
 {
-    dest = string<100>(TruncateToCapacity, v);
+    dest = string<Capacity>(TruncateToCapacity, v);
     return true;
 }
-/// @NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 inline bool convert::stringIsNumber(const char* v, const NumberType type) noexcept
 {
