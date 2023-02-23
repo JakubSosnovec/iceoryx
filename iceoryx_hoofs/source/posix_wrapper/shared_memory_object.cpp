@@ -191,7 +191,7 @@ int32_t SharedMemoryObject::get_file_handle() const noexcept
     return m_sharedMemory.getHandle();
 }
 
-int32_t SharedMemoryObject::getFileHandle() const noexcept
+int SharedMemoryObject::getFileHandle() const noexcept
 {
     return m_sharedMemory.getHandle();
 }

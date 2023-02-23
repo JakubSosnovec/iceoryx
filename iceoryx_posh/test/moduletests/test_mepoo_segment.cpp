@@ -71,6 +71,20 @@ class MePooSegment_test : public Test
             remove("/tmp/roudi_segment_test");
         }
 
+        iox::BumpAllocator& getBumpAllocator()
+        {
+            return *allocator;
+        }
+
+        void finalizeAllocation()
+        {
+        }
+
+        void* allocate(const uint64_t, const uint64_t = 0)
+        {
+            return nullptr;
+        }
+
         int getFileHandle()
         {
             return filehandle;
