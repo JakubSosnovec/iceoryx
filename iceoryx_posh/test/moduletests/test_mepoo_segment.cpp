@@ -85,7 +85,7 @@ class MePooSegment_test : public Test
             return nullptr;
         }
 
-        int getFileHandle()
+        int32_t getFileHandle()
         {
             return filehandle;
         }
