@@ -71,7 +71,7 @@ iox_add_library(
     PUBLIC_LIBS_LINUX           rt pthread
     PUBLIC_LIBS_UNIX            rt pthread
     PRIVATE_LIBS_QNX            socket
-    PUBLIC_LIBS_FREERTOS        FreeRTOS_POSIX::FreeRTOS_POSIX
+    PUBLIC_LIBS_FREERTOS        freertos_sdk::FreeRTOS_POSIX
     BUILD_INTERFACE             ${ICEORYX_PLATFORM}/include/
     INSTALL_INTERFACE           include/${PREFIX}
     FILES                       ${ICEORYX_PLATFORM_FILES}
