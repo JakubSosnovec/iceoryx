@@ -26,4 +26,4 @@ if(BUILD_STRICT)
     set_global(VAR ICEORYX_CXX_WARNINGS     VALUE ${ICEORYX_CXX_WARNINGS} -Werror)
 endif()
 
-find_package(FreeRTOS_POSIX REQUIRED)
+find_package(freertos_sdk REQUIRED COMPONENTS FreeRTOS_cpp11 FreeRTOS_POSIX)
