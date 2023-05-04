@@ -64,6 +64,12 @@ int iox_shm_unlink(const char* name)
     }
 }
 
+int iox_shm_close(int)
+{
+    // We do all the closing in unlink
+    return 0;
+}
+
 void* mmap(void*, size_t length, int, int, int fd, off_t)
 {
     std::lock_guard<std::mutex> lock{ShmFile::openFilesMutex};

@@ -28,5 +28,6 @@
 #define LOCK_UN         0x08            /* unlock file */
 
 int iox_open(const char* pathname, int flags, mode_t mode);
+int iox_ext_open(const char* pathname, int flags, mode_t mode);
 
 #endif // IOX_HOOFS_FREERTOS_PLATFORM_FCNTL_HPP

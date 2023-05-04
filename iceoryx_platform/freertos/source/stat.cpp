@@ -17,8 +17,31 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "iceoryx_platform/stat.hpp"
+#include "iceoryx_platform/shm_file.hpp"
+
+#include <algorithm>
 
 mode_t umask(mode_t)
 {
     return mode_t{};
+}
+
+int iox_fstat(int fildes, iox_stat* buf)
+{
+    buf->st_uid = 0;
+    buf->st_gid = 0;
+    buf->st_mode = 0777;
+
+    std::lock_guard<std::mutex> lock{ShmFile::openFilesMutex};
+    const auto iter = std::find_if(std::begin(ShmFile::openFiles),
+                                   std::end(ShmFile::openFiles),
+                                   [fildes](const ShmFile& f) { return f.fd() == fildes; });
+    configASSERT(iter != std::end(ShmFile::openFiles));
+    buf->st_size = iter->size();
+    return 0;
+}
+
+int iox_fchmod(int, iox_mode_t)
+{
+    return 0;
 }

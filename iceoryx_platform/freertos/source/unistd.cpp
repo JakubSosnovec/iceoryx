@@ -30,6 +30,11 @@ int iox_close(int)
     return 0;
 }
 
+int iox_ext_close(int)
+{
+    return 0;
+}
+
 int ftruncate(int fd, off_t length)
 {
     std::lock_guard<std::mutex> lock{ShmFile::openFilesMutex};
@@ -62,4 +67,34 @@ long sysconf(int)
     // This is only ever used to find the page size. Lets just return 4 kB as usual, even though there is no paging on
     // FreeRTOS
     return 4096;
+}
+
+int iox_fchown(int, uid_t, gid_t)
+{
+    return 0;
+}
+
+int iox_access(const char*, int)
+{
+    return 0;
+}
+
+int iox_unlink(const char*)
+{
+    return 0;
+}
+
+iox_off_t iox_lseek(int, iox_off_t offset, int)
+{
+    return offset;
+}
+
+iox_ssize_t iox_read(int, void*, size_t)
+{
+    return 0;
+}
+
+iox_ssize_t iox_write(int, const void*, size_t)
+{
+    return 0;
 }

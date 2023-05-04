@@ -21,4 +21,16 @@
 
 #include "iceoryx_platform/fcntl.hpp"
 
+struct iox_stat
+{
+    int st_uid;
+    int st_gid;
+    int st_mode;
+    uint32_t st_size;
+};
+using iox_mode_t = int;
+
+int iox_fstat(int fildes, iox_stat* buf);
+int iox_fchmod(int, iox_mode_t);
+
 #endif // IOX_HOOFS_FREERTOS_PLATFORM_STAT_HPP
